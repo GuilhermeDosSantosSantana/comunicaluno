@@ -1,0 +1,56 @@
+package br.com.comunicaluno.service;
+
+import br.com.comunicaluno.dao.UsuarioDAO;
+import br.com.comunicaluno.model.Usuario;
+import org.mindrot.jbcrypt.BCrypt;
+
+/**
+ * Camada de Negócio. Nenhuma regra de negócio (como encriptação ou validação)
+ * deve estar no Ecrã ou no DAO. O Serviço orquestra a lógica da aplicação.
+ */
+public class UsuarioService {
+
+    private UsuarioDAO usuarioDAO;
+
+    public UsuarioService() {
+        this.usuarioDAO = new UsuarioDAO();
+    }
+
+    /**
+     * Regista um novo utilizador no sistema, aplicando as regras de validação e segurança.
+     * @param usuario O objeto utilizador vindo do Ecrã (ainda com a palavra-passe em texto limpo)
+     * @throws IllegalArgumentException Se as validações de negócio falharem
+     */
+    public void registarNovoUsuario(Usuario usuario) {
+        
+        // 1. VALIDAÇÕES BÁSICAS (Evita chamadas desnecessárias à base de dados)
+        if (usuario.getNome() == null || usuario.getNome().trim().isEmpty()) {
+            throw new IllegalArgumentException("O nome do utilizador não pode estar vazio.");
+        }
+        
+        if (usuario.getEmail() == null || !usuario.getEmail().contains("@")) {
+            throw new IllegalArgumentException("E-mail inválido. Por favor, insira um e-mail válido.");
+        }
+        
+        // A ASVS recomenda pelo menos 8 ou 12 caracteres, mas vamos manter simples por agora
+        if (usuario.getSenhaHash() == null || usuario.getSenhaHash().length() < 6) {
+            throw new IllegalArgumentException("A palavra-passe deve conter pelo menos 6 caracteres.");
+        }
+        
+        // 2. SEGURANÇA (A palavra-passe ainda está em texto limpo aqui. Vamos encriptar!)
+        String senhaLimpa = usuario.getSenhaHash();
+        String senhaCriptografada = BCrypt.hashpw(senhaLimpa, BCrypt.gensalt(12));
+        
+        // Substitui a palavra-passe limpa pela encriptada ANTES de mandar para o DAO
+        usuario.setSenhaHash(senhaCriptografada);
+        
+        // 3. REGRA DE NEGÓCIO: Todo o utilizador recém-registado começa como PENDENTE, 
+        // a menos que estejamos a criar um super-admin via backend.
+        if (usuario.getStatusConta() == null) {
+            usuario.setStatusConta("PENDENTE");
+        }
+
+        // 4. GUARDA (Passa para a camada de acesso a dados)
+        usuarioDAO.salvar(usuario);
+    }
+}

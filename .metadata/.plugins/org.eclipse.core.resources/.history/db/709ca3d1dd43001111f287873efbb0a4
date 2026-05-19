@@ -1,0 +1,29 @@
+package br.com.comunicaluno.dao;
+
+import br.com.comunicaluno.model.Usuario;
+import org.junit.jupiter.api.Test;
+
+public class UsuarioDAOTest {
+
+
+    public void testarSalvarUsuario() {
+        
+
+        Usuario usuarioTeste = new Usuario(
+                "Carlos Auditor", 
+                "carlos.auditoria@comunicaluno.com.br", 
+                "hash_senha_segura_aqui", 
+                "PROF", 
+                "ATIVO"
+        );
+        
+
+        UsuarioDAO dao = new UsuarioDAO();
+        
+        System.out.println("Iniciando o teste de inserção no banco...");
+
+        dao.salvar(usuarioTeste);
+        
+        System.out.println("Teste finalizado. Verifique o seu banco de dados!");
+    }
+}

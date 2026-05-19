@@ -1,0 +1,36 @@
+package br.com.comunicaluno.dao;
+
+import br.com.comunicaluno.jdbc.ConnectionFactory;
+import br.com.comunicaluno.model.Usuario;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
+public class UsuarioDAO {
+
+    /**
+     * Guarda um utilizador na base de dados garantindo a proteção contra SQL Injection (OWASP ASVS V5).
+     */
+    public void salvar(Usuario usuario) {
+        // Os campos created_at e updated_at são gerados automaticamente pela base de dados.
+        String sql = "INSERT INTO usuarios (nome, email, senha_hash, tipo_perfil, status_conta) VALUES (?, ?, ?, ?, ?)";
+
+        try (Connection conn = new ConnectionFactory().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            // Substituição segura dos parâmetros (?)
+            stmt.setString(1, usuario.getNome());
+            stmt.setString(2, usuario.getEmail());
+            stmt.setString(3, usuario.getSenhaHash()); // Aqui a palavra-passe JÁ DEVE chegar encriptada
+            stmt.setString(4, usuario.getTipoPerfil());
+            stmt.setString(5, usuario.getStatusConta());
+
+            stmt.executeUpdate();
+            
+        } catch (SQLException e) {
+            // Em caso de erro (ex: e-mail duplicado violando a constraint UNIQUE), a aplicação é notificada.
+            throw new RuntimeException("Erro ao guardar utilizador na base de dados: " + e.getMessage(), e);
+        }
+    }
+}

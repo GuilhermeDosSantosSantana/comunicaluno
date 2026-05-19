@@ -1,0 +1,78 @@
+package br.com.comunicaluno.service;
+
+import br.com.comunicaluno.dao.UsuarioDAO;
+import br.com.comunicaluno.model.Usuario;
+import org.mindrot.jbcrypt.BCrypt;
+
+/**
+ * Camada de Negócio. Nenhuma regra de negócio (como encriptação ou validação)
+ * deve estar no Ecrã ou no DAO. O Serviço orquestra a lógica da aplicação.
+ */
+public class UsuarioService {
+
+    private UsuarioDAO usuarioDAO;
+
+    public UsuarioService() {
+        this.usuarioDAO = new UsuarioDAO();
+    }
+
+    /**
+     * Regista um novo utilizador no sistema, aplicando as regras de validação e segurança.
+     * @param usuario O objeto utilizador vindo do Ecrã (ainda com a palavra-passe em texto limpo)
+     * @throws IllegalArgumentException Se as validações de negócio falharem
+     */
+    public void registarNovoUsuario(Usuario usuario) {
+        
+        // 1. VALIDAÇÕES BÁSICAS (Evita chamadas desnecessárias à base de dados)
+        if (usuario.getNome() == null || usuario.getNome().trim().isEmpty()) {
+            throw new IllegalArgumentException("O nome do utilizador não pode estar vazio.");
+        }
+        
+        if (usuario.getEmail() == null || !usuario.getEmail().contains("@")) {
+            throw new IllegalArgumentException("E-mail inválido. Por favor, insira um e-mail válido.");
+        }
+        
+        if (usuario.getSenhaHash() == null || usuario.getSenhaHash().length() < 6) {
+            throw new IllegalArgumentException("A palavra-passe deve conter pelo menos 6 caracteres.");
+        }
+        
+        // 2. SEGURANÇA (A palavra-passe ainda está em texto limpo aqui. Vamos encriptar!)
+        String senhaLimpa = usuario.getSenhaHash();
+        String senhaCriptografada = BCrypt.hashpw(senhaLimpa, BCrypt.gensalt(12));
+        
+        // Substitui a palavra-passe limpa pela encriptada ANTES de mandar para o DAO
+        usuario.setSenhaHash(senhaCriptografada);
+        
+        // 3. REGRA DE NEGÓCIO: Todo o utilizador recém-registado começa como PENDENTE
+        if (usuario.getStatusConta() == null) {
+            usuario.setStatusConta("PENDENTE");
+        }
+
+        // 4. GUARDA (Passa para a camada de acesso a dados)
+        usuarioDAO.salvar(usuario);
+    }
+
+    /**
+     * Tenta autenticar um utilizador.
+     * @param email E-mail digitado
+     * @param senhaDigitada Senha em texto limpo vinda do formulário
+     * @return O objeto Usuario se autenticado com sucesso
+     * @throws SecurityException Se as credenciais forem inválidas (Prevenção de User Enumeration)
+     */
+    public Usuario autenticar(String email, String senhaDigitada) {
+        // Buscamos o utilizador pelo e-mail
+        Usuario usuario = usuarioDAO.buscarPorEmail(email);
+
+        // Se o utilizador existir e a password for válida
+        if (usuario != null && BCrypt.checkpw(senhaDigitada, usuario.getSenhaHash())) {
+            if (!"ATIVO".equals(usuario.getStatusConta())) {
+                throw new SecurityException("Conta pendente de aprovação ou inativa.");
+            }
+            return usuario;
+        }
+
+        // Honesty Técnico: Nunca diga "Senha incorreta". Diga "Credenciais inválidas" 
+        // para não confirmar a um atacante que o e-mail existe na base.
+        throw new SecurityException("E-mail ou palavra-passe incorretos.");
+    }
+}

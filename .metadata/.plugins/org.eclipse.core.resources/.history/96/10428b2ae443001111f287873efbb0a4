@@ -1,0 +1,5 @@
+package br.com.comunicaluno.model;
+
+public class Comunicado {
+
+}

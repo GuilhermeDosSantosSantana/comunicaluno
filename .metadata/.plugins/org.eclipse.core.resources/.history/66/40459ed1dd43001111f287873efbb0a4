@@ -1,0 +1,28 @@
+package br.com.comunicaluno.dao;
+
+import br.com.comunicaluno.jdbc.ConnectionFactory;
+import br.com.comunicaluno.model.Usuario;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
+public class UsuarioDAO {
+	public void salvar(Usuario usuario) {    
+	    String sql = "INSERT INTO usuarios (nome, email, senha_hash, tipo_perfil, status_conta) VALUES (?, ?, ?, ?, ?)";
+	    try (Connection conn = new ConnectionFactory().getConnection();
+	         PreparedStatement stmt = conn.prepareStatement(sql)) {
+	            
+	        stmt.setString(1, usuario.getNome());
+	        stmt.setString(2, usuario.getEmail());
+	        stmt.setString(3, usuario.getSenhaHash());
+	        stmt.setString(4, usuario.getTipoPerfil());
+	        stmt.setString(5, usuario.getStatusConta());
+	        
+	        stmt.executeUpdate();
+	        
+	        System.out.println("Usuário " + usuario.getNome() + " salvo com sucesso no banco!");
+	        
+	    } catch (SQLException e) {
+	        throw new RuntimeException("Erro ao salvar o usuário no banco de dados: " + e.getMessage(), e);
+	    }}}

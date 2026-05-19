@@ -1,0 +1,7 @@
+package config;
+
+public class properties {
+	db.url=jdbc:mysql://localhost:3306/comunicaluno
+		db.user=root
+		db.password=host
+}

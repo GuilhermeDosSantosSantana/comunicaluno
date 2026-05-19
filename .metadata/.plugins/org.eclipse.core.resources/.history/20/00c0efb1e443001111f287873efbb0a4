@@ -1,0 +1,5 @@
+package br.com.comunicaluno.service;
+
+public class ComunicadoService {
+
+}

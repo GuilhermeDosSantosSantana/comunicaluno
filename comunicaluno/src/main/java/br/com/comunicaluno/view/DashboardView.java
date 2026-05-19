@@ -1,0 +1,94 @@
+package br.com.comunicaluno.view;
+
+import br.com.comunicaluno.model.Usuario;
+
+import javax.swing.*;
+import java.awt.*;
+
+public class DashboardView extends JFrame {
+
+    private Usuario usuarioLogado; // A "Sessão" do utilizador atual
+
+    /**
+     * Construtor que exige o utilizador autenticado.
+     * Nunca permitimos instanciar este ecrã sem uma prova de identidade.
+     */
+    public DashboardView(Usuario usuarioLogado) {
+        if (usuarioLogado == null) {
+            throw new SecurityException("Acesso negado: Tentativa de aceder ao dashboard sem autenticação.");
+        }
+        this.usuarioLogado = usuarioLogado;
+        
+        configurarJanela();
+        inicializarComponentes();
+    }
+
+    private void configurarJanela() {
+        setTitle("ComunicAluno - Dashboard Principal");
+        setSize(600, 400);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
+        setLayout(new BorderLayout()); // BorderLayout é perfeito para painéis com cabeçalho e menu lateral
+    }
+
+    private void inicializarComponentes() {
+        // --- CABEÇALHO (Top) ---
+        JPanel painelTop = new JPanel(new BorderLayout());
+        painelTop.setBackground(new Color(33, 150, 243)); // Azul corporativo
+        painelTop.setBorder(BorderFactory.createEmptyBorder(10, 15, 10, 15));
+
+        JLabel lblBoasVindas = new JLabel("Bem-vindo(a), " + usuarioLogado.getNome());
+        lblBoasVindas.setForeground(Color.WHITE);
+        lblBoasVindas.setFont(new Font("Arial", Font.BOLD, 16));
+        
+        JLabel lblPerfil = new JLabel("Perfil: " + usuarioLogado.getTipoPerfil());
+        lblPerfil.setForeground(new Color(224, 224, 224));
+
+        painelTop.add(lblBoasVindas, BorderLayout.WEST);
+        painelTop.add(lblPerfil, BorderLayout.EAST);
+        add(painelTop, BorderLayout.NORTH);
+
+        // --- CENTRO (Ações Principais) ---
+        JPanel painelCentro = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 10, 10, 10);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+
+     // --- Botão: Mural de Comunicados ---
+        gbc.gridx = 0; gbc.gridy = 0;
+        JButton btnComunicados = new JButton("Mural de Comunicados");
+        
+        // AQUI ESTÁ O CÓDIGO NOVO: O evento que abre o ecrã do Mural e passa o utilizador logado!
+        btnComunicados.addActionListener(e -> {
+            new ComunicadosView(this.usuarioLogado).setVisible(true);
+        });
+        
+        painelCentro.add(btnComunicados, gbc);
+
+        gbc.gridy = 1;
+        JButton btnChamados = new JButton("Meus Chamados (Helpdesk)");
+        painelCentro.add(btnChamados, gbc);
+
+        // Controlo de Acesso Baseado em Funções (RBAC) Simples
+        if ("ADMIN".equals(usuarioLogado.getTipoPerfil()) || "COORDENADOR".equals(usuarioLogado.getTipoPerfil())) {
+            gbc.gridy = 2;
+            JButton btnAdmin = new JButton("Administração de Contas");
+            btnAdmin.setBackground(new Color(255, 152, 0)); // Destaca o botão admin
+            btnAdmin.setForeground(Color.WHITE);
+            painelCentro.add(btnAdmin, gbc);
+        }
+
+        add(painelCentro, BorderLayout.CENTER);
+
+        // --- RODAPÉ (Bottom - Logout) ---
+        JPanel painelBottom = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        JButton btnSair = new JButton("Terminar Sessão");
+        btnSair.addActionListener(e -> {
+            // Destrói o dashboard e volta para o login
+            new LoginView().setVisible(true);
+            this.dispose(); 
+        });
+        painelBottom.add(btnSair);
+        add(painelBottom, BorderLayout.SOUTH);
+    }
+}

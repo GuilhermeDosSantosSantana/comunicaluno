@@ -1,0 +1,49 @@
+package br.com.comunicaluno.jdbc;
+
+import java.io.InputStream;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.util.Properties;
+
+public class ConnectionFactory {
+
+    private Properties props;
+
+    public ConnectionFactory() {
+        props = new Properties();
+        try (InputStream in = getClass().getClassLoader().getResourceAsStream("config.properties")) {
+            if (in != null) {
+                props.load(in);
+            } else {
+                throw new RuntimeException("Arquivo config.properties não encontrado.");
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Erro ao carregar as configurações do banco: " + e.getMessage());
+        }
+    }
+    public Connection getConnection() {
+        try {
+            String url = props.getProperty("db.url");
+            String user = props.getProperty("db.user");
+            String password = props.getProperty("db.password");
+            
+            return DriverManager.getConnection(url, user, password);
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro de conexão (verifique se o banco está de pé e as credenciais corretas): " + e.getMessage(), e);
+        }
+    }
+
+    // Método main exclusivo para teste de sanidade
+    public static void main(String[] args) {
+        ConnectionFactory factory = new ConnectionFactory();
+        try (Connection conn = factory.getConnection()) {
+            if (conn != null && !conn.isClosed()) {
+                System.out.println("SUCESSO: Conexão segura e estabelecida com comunicaluno_db!");
+            }
+        } catch (Exception e) {
+            System.err.println("FALHA CRÍTICA: Não foi possível conectar.");
+            e.printStackTrace();
+        }
+    }
+}
