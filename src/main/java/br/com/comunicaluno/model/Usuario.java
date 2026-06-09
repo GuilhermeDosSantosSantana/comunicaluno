@@ -1,0 +1,67 @@
+package br.com.comunicaluno.model;
+
+import java.time.LocalDateTime;
+
+public class Usuario {
+    
+    private Integer idUsuario;
+    private String nome;
+    private String email;
+    private String senhaHash;
+    private String tipoPerfil; 
+    private String statusConta; 
+    private String avatarPath;
+    private String turma;
+    private String curso;
+    private Integer aprovadoPor; 
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+
+    public Usuario() {}
+
+
+    public Usuario(String nome, String email, String senhaHash, String tipoPerfil) {
+        this.nome = nome;
+        this.email = email;
+        this.senhaHash = senhaHash;
+        this.tipoPerfil = tipoPerfil;
+        this.statusConta = "PENDENTE"; 
+    }
+
+
+    public Integer getIdUsuario() { return idUsuario; }
+    public void setIdUsuario(Integer idUsuario) { this.idUsuario = idUsuario; }
+
+    public String getNome() { return nome; }
+    public void setNome(String nome) { this.nome = nome; }
+
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
+
+    public String getSenhaHash() { return senhaHash; }
+    public void setSenhaHash(String senhaHash) { this.senhaHash = senhaHash; }
+
+    public String getTipoPerfil() { return tipoPerfil; }
+    public void setTipoPerfil(String tipoPerfil) { this.tipoPerfil = tipoPerfil; }
+
+    public String getStatusConta() { return statusConta; }
+    public void setStatusConta(String statusConta) { this.statusConta = statusConta; }
+
+    public String getAvatarPath() { return avatarPath; }
+    public void setAvatarPath(String avatarPath) { this.avatarPath = avatarPath; }
+
+    public String getTurma() { return turma; }
+    public void setTurma(String turma) { this.turma = turma; }
+
+    public String getCurso() { return curso; }
+    public void setCurso(String curso) { this.curso = curso; }
+
+    public Integer getAprovadoPor() { return aprovadoPor; }
+    public void setAprovadoPor(Integer aprovadoPor) { this.aprovadoPor = aprovadoPor; }
+
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+
+    public LocalDateTime getUpdatedAt() { return updatedAt; }
+    public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
+}
