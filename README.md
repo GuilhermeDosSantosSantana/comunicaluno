@@ -1,3 +1,5 @@
+# Por favor leia tudo, o MOCK e o banco estão na pasta src/main/resources/db/ com todas as versões do banco, as Versão 2 foi a da primeira entrega
+
 # ComunicAluno
 
 O ComunicAluno é uma aplicação desktop em Java, com interface em JavaFX e banco de dados MySQL, criada para centralizar a comunicação acadêmica entre alunos, professores, coordenadores e administradores.
