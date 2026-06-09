@@ -1,11 +1,15 @@
 ## Por favor leia tudo, o MOCK e o banco estão na pasta src/main/resources/db/ com todas as versões do banco, as Versão 2 foi a da primeira entrega
 
-Vinícius Pampolim Silva - 823157424
-Lucas Felipe Dias - 823116804
-Raul Bertolla Silveira - 82318856
-Gabriel Coelho Bononi - 823156221
-Eduardo de Paiva Mantovam - 82316154
-Guilherme Dos Santos Santana - 823159723
+## Integrantes do Projeto
+
+| Nome                         |        RA |
+| ---------------------------- | --------: |
+| Vinícius Pampolim Silva      | 823157424 |
+| Lucas Felipe Dias            | 823116804 |
+| Raul Bertolla Silveira       |  82318856 |
+| Gabriel Coelho Bononi        | 823156221 |
+| Eduardo de Paiva Mantovam    |  82316154 |
+| Guilherme Dos Santos Santana | 823159723 |
 
 # ComunicAluno
 
